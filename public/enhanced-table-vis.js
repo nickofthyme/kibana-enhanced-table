@@ -5,34 +5,23 @@ import './agg_table/agg_table_group';
 import './draggable';
 
 import { i18n } from '@kbn/i18n';
-import { VisFactoryProvider } from 'ui/vis/vis_factory';
+import { visFactory } from 'ui/vis/vis_factory';
 import { Schemas } from 'ui/vis/editors/default/schemas';
+import { AngularVisController } from 'ui/vis/vis_types/angular_vis_type';
 import tableVisTemplate from './enhanced-table-vis.html';
-import { VisTypesRegistryProvider } from 'ui/registry/vis_types';
-import { VisFiltersProvider, createFiltersFromEvent } from 'ui/vis/vis_filters';
-
-// we need to load the css ourselves
-
-// we also need to load the controller and used by the template
-
-// our params are a bit complex so we will manage them with a directive
-
-// require the directives that we use as well
+import { setup as visualizations } from '../../../src/legacy/core_plugins/visualizations/public/np_ready/public/legacy';
+import { createFiltersFromEvent } from 'ui/vis/vis_filters';
 
 // register the provider with the visTypes registry
-VisTypesRegistryProvider.register(EnhancedTableVisTypeProvider);
+visualizations.types.registerVisualization(EnhancedTableVisTypeProvider);
 
 // define the TableVisType
 function EnhancedTableVisTypeProvider(Private) {
-  const VisFactory = Private(VisFactoryProvider);
-  const visFilters = Private(VisFiltersProvider);
 
-  // define the EnhancedTableVisTypeProvider which is used in the template
-  // by angular's ng-controller directive
+  // define the EnhancedTableVisTypeProvider which is used in the template by angular's ng-controller directive
 
-  // return the visType object, which kibana will use to display and configure new
-  // Vis object of this type.
-  return VisFactory.createAngularVisualization({
+  // return the visType object, which kibana will use to display and configure new Vis object of this type.
+  return visFactory.createBaseVisualization({
     type: 'table',
     name: 'enhanced-table',
     title: i18n.translate('tableVis.enhancedTableVisTitle', {
@@ -42,6 +31,7 @@ function EnhancedTableVisTypeProvider(Private) {
     description: i18n.translate('tableVis.enhancedTableVisDescription', {
       defaultMessage: 'Same functionality than Data Table, but with enhanced features like computed columns and filter bar.'
     }),
+    visualization: AngularVisController,
     visConfig: {
       defaults: {
         perPage: 10,
@@ -121,10 +111,10 @@ function EnhancedTableVisTypeProvider(Private) {
     },
     events: {
       filterBucket: {
-        defaultAction: function (event, { simulate = false } = {}) {
+        defaultAction: function (event) {
           event.aggConfigs = event.data[0].table.columns.map(column => column.aggConfig);
           const filters = createFiltersFromEvent(event);
-          visFilters.pushFilters(filters, simulate);
+          return filters;
         }
       }
     },
