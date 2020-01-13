@@ -45,8 +45,6 @@ module.controller('EnhancedTableVisController', function ($scope, Private, confi
   }
 
   const getConfig = (...args) => config.get(...args);
-  const isDarkTheme = getConfig('theme:darkMode');
-
   handlebars.registerHelper('encodeURIComponent', encodeURIComponent);
 
   // controller methods
@@ -724,8 +722,7 @@ module.controller('EnhancedTableVisController', function ($scope, Private, confi
       $scope.tableVisContainerClass = {
         'hide-pagination': !showPagination,
         'hide-export-links': params.hideExportLinks,
-        'striped-rows': params.stripedRows,
-        'theme-dark': isDarkTheme
+        'striped-rows': params.stripedRows
       };
 
       // update $scope
